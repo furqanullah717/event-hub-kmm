@@ -49,17 +49,14 @@ fun App(
     dynamicColor: Boolean,
     appModule: AppModule,
 ) {
-
-
     val navigator = rememberNavigator()
     AppTheme(
         darkTheme,
     ) {
-
         val home = stringResource(MR.strings.text_home)
         val showBottomBar = remember { mutableStateOf(false) }
         val selectedTab = remember { mutableStateOf(home) }
-        Scaffold( bottomBar = {
+        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
             AnimatedVisibility(
                 showBottomBar.value, enter = fadeIn(), exit = fadeOut()
             ) {
@@ -121,8 +118,7 @@ fun App(
                     route = "/home",
                     // Navigation transition for this scene, this is optional
                     navTransition = NavTransition(
-                        createTransition = fadeIn(),
-                        destroyTransition = fadeOut()
+                        createTransition = fadeIn(), destroyTransition = fadeOut()
                     )
                 ) {
                     showBottomBar.value = true
