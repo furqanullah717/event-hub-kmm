@@ -3,6 +3,8 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     id("dev.icerock.mobile.multiplatform-resources")
+    id("kotlinx-serialization")
+
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
@@ -12,7 +14,7 @@ kotlin {
     android {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "17"
             }
         }
     }
@@ -37,7 +39,9 @@ kotlin {
 
     sourceSets {
 
-            val ktorVersion = "2.3.4"
+        val ktorVersion = "2.3.4"
+        val coroutinesVersion = "1.7.3"
+        val serializationVersion = "1.6.0"
 
         val commonMain by getting {
             dependencies {
@@ -48,7 +52,7 @@ kotlin {
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
                 api("moe.tlaster:precompose:1.5.4")
-
+                implementation("media.kamel:kamel-image:0.7.3")
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("dev.icerock.moko:mvvm-core:0.16.1")
                 implementation("dev.icerock.moko:mvvm-compose:0.16.1")
@@ -56,7 +60,11 @@ kotlin {
                 implementation("dev.icerock.moko:mvvm-flow-compose:0.16.1")
                 api("dev.icerock.moko:resources-compose:0.23.0")
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
 
             }
         }
@@ -71,7 +79,6 @@ kotlin {
                 implementation("androidx.appcompat:appcompat:1.6.1")
                 implementation("androidx.activity:activity-compose:1.7.2")
                 implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
             }
         }
@@ -105,6 +112,10 @@ android {
     compileSdk = 33
     defaultConfig {
         minSdk = 24
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

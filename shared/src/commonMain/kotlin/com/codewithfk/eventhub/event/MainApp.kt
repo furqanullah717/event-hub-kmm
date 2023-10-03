@@ -10,15 +10,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,15 +25,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import com.codewithfk.eventhub.core.presentation.stringResource
 import com.codewithfk.eventhub.di.AppModule
+import com.codewithfk.eventhub.event.presentation.home.HomeScreen
 import com.codewithfk.eventhub.event.splash.SplashScreen
 import com.codewithfk.eventhub.theme.AppTheme
 import com.codewithfk.goodnight.MR
+import dev.icerock.moko.resources.ImageResource
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
@@ -54,6 +50,7 @@ fun App(
         darkTheme,
     ) {
         val home = stringResource(MR.strings.text_home)
+        val profile = stringResource(MR.strings.text_profile)
         val showBottomBar = remember { mutableStateOf(false) }
         val selectedTab = remember { mutableStateOf(home) }
         Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
@@ -62,10 +59,10 @@ fun App(
             ) {
                 BottomAppBar(
                     modifier = Modifier.fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.onPrimary)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -75,7 +72,21 @@ fun App(
                                     navigator.navigate("/home")
                                     selectedTab.value = home
                                 }
-                            }, string = home, vector = Icons.Default.Home, selectedTab.value == home
+                            },
+                            string = home,
+                            image = MR.images.ic_explore,
+                            selectedTab.value == home
+                        )
+                        BottomNavActionItem(
+                            modifier = Modifier.weight(1f).fillMaxSize().clickable {
+                                if (selectedTab.value != profile) {
+                                    navigator.navigate("/profile")
+                                    selectedTab.value = profile
+                                }
+                            },
+                            string = profile,
+                            image = MR.images.ic_profile,
+                            selectedTab.value == profile
                         )
                     }
                 }
@@ -91,7 +102,7 @@ fun App(
                     destroyTransition = slideOutHorizontally()
                 ),
                 // The start destination
-                initialRoute = "/splash",
+                initialRoute = "/home",
             ) {
                 // Define a scene to the navigation graph
                 scene(
@@ -124,22 +135,33 @@ fun App(
                     showBottomBar.value = true
                     HomeScreen(appModule, navigator)
                 }
+                scene(
+                    // Scene's route path
+                    route = "/profile",
+                    // Navigation transition for this scene, this is optional
+                    navTransition = NavTransition(
+                        createTransition = fadeIn(), destroyTransition = fadeOut()
+                    )
+                ) {
+                    showBottomBar.value = true
+                    Box(){}
+                }
             }
         }
     }
 }
 
 @Composable
-fun BottomNavActionItem(modifier: Modifier, string: String, vector: ImageVector, b: Boolean) {
+fun BottomNavActionItem(modifier: Modifier, string: String, image: ImageResource, b: Boolean) {
     val color =
-        if (b) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.inversePrimary
+        if (b) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            imageVector = vector,
+            painter = dev.icerock.moko.resources.compose.painterResource(image),
             contentDescription = string,
             modifier = Modifier,
             colorFilter = ColorFilter.tint(color)
