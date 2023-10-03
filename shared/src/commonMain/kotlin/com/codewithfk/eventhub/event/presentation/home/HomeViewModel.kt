@@ -28,17 +28,12 @@ class HomeViewModel : ViewModel() {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun getData() {
+    private fun getData() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val response = NetworkHandler.get(NetworkHandler.createEventsUrl())
+                val response = NetworkHandler.createEventsUrl()
                 response.let {
-                    val body = it.bodyAsText()
-                    print("HomeViewModel  getData: $body")
-                    val res =
-                        json
-                            .decodeFromString<EventListResponse>(body)
-                    _state.value = res
+                    _state.value = it
                 }
             }
 
