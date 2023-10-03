@@ -6,6 +6,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
 
 object NetworkHandler {
     private const val API_KEY = "apikey=Kv9uInIsbKqAH4kuYUajU4ABjxUKsLzP"
@@ -14,8 +15,8 @@ object NetworkHandler {
     private const val EVENT_DETAILS_ENDPOINT = "/discovery/v2/events/"
     private val kTorClient = HttpClient()
 
-    suspend fun get(url: String): String {
-        return kTorClient.get(url).toString()
+    suspend fun get(url: String): HttpResponse {
+        return kTorClient.get(url)
     }
 
     suspend fun post(url: String, requset: Any): String {

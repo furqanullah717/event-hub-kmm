@@ -1,6 +1,10 @@
+
 buildscript {
     dependencies {
+        val kotlinVersion = rootProject.extra["kotlin.version"] as String
         classpath ("dev.icerock.moko:resources-generator:0.23.0")
+        classpath ("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
+
     }
 }
 
