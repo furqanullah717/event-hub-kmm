@@ -198,7 +198,7 @@ fun HomeScreen(appModule: AppModule, navigator: Navigator) {
 
                 val state = viewModel.state.collectAsState(null)
                 state.value?.let {
-                    EventRow("Popular Events", it._embedded.events)
+                    EventRow("Popular Events", it._embedded.events, navigator)
                 }
 
             }
@@ -235,16 +235,16 @@ fun Category(title: String, image: ImageResource, backGroundColor: Color) {
             contentDescription = null,
             modifier = Modifier.size(18.dp),
             contentScale = ContentScale.FillBounds,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+            colorFilter = ColorFilter.tint(Color.White)
         )
         Spacer(modifier = Modifier.size(8.dp))
-        Text(title, color = MaterialTheme.colorScheme.onPrimary)
+        Text(title, color = Color.White)
     }
     Spacer(modifier = Modifier.size(4.dp))
 }
 
 @Composable
-fun EventRow(title: String, events: List<Event>) {
+fun EventRow(title: String, events: List<Event>, navigator: Navigator) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
             Text(
@@ -266,16 +266,19 @@ fun EventRow(title: String, events: List<Event>) {
         }
         LazyRow {
             items(events.size) { index ->
-                EventCard(events[index])
+                EventCard(events[index], onClicked = {
+                    navigator.navigate("/details/$it")
+                })
             }
         }
     }
 }
 
 @Composable
-fun EventCard(event: Event) {
+fun EventCard(event: Event, onClicked: (String) -> Unit) {
     ElevatedCard(
-        modifier = Modifier.clip(RoundedCornerShape(16.dp)).padding(8.dp),
+        modifier = Modifier.clip(RoundedCornerShape(16.dp)).padding(8.dp)
+            .clickable { onClicked(event.id!!) },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Column(modifier = Modifier.width(237.dp).padding(8.dp)) {
@@ -306,7 +309,7 @@ fun EventCard(event: Event) {
             }
             Spacer(modifier = Modifier.size(16.dp))
             Text(
-                text = event?.name ?: "",
+                text = event.name ?: "",
                 fontSize = 16.sp,
                 fontWeight = FontWeight(600),
                 color = MaterialTheme.colorScheme.onBackground,
@@ -314,38 +317,7 @@ fun EventCard(event: Event) {
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.size(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box() {
-                    Row {
-                        Spacer(Modifier.size(48.dp))
-                        Image(
-                            modifier = Modifier.size(48.dp),
-                            painter = painterResource(MR.images.ic_image2),
-                            contentDescription = null,
-                        )
-                    }
-                    Row {
-                        Spacer(Modifier.size(24.dp))
-                        Image(
-                            modifier = Modifier.size(48.dp),
-                            painter = painterResource(MR.images.ic_image1),
-                            contentDescription = null,
-
-                            )
-                    }
-                    Image(
-                        modifier = Modifier.size(48.dp).clip(CircleShape),
-                        painter = painterResource(MR.images.ic_image),
-                        contentDescription = null,
-                    )
-                }
-                Text(
-                    text = " 20+ Going",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight(500),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            GoingItem()
 
             Spacer(Modifier.size(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -367,6 +339,40 @@ fun EventCard(event: Event) {
             Spacer(Modifier.size(16.dp))
         }
     }
+}
 
+@Composable
+fun GoingItem() {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box() {
+            Row {
+                Spacer(Modifier.size(48.dp))
+                Image(
+                    modifier = Modifier.size(48.dp),
+                    painter = painterResource(MR.images.ic_image2),
+                    contentDescription = null,
+                )
+            }
+            Row {
+                Spacer(Modifier.size(24.dp))
+                Image(
+                    modifier = Modifier.size(48.dp),
+                    painter = painterResource(MR.images.ic_image1),
+                    contentDescription = null,
 
+                    )
+            }
+            Image(
+                modifier = Modifier.size(48.dp).clip(CircleShape),
+                painter = painterResource(MR.images.ic_image),
+                contentDescription = null,
+            )
+        }
+        Text(
+            text = " 20+ Going",
+            fontSize = 14.sp,
+            fontWeight = FontWeight(500),
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
 }

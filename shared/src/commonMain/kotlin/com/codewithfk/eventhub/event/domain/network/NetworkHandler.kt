@@ -1,5 +1,6 @@
 package com.codewithfk.eventhub.event.domain.network
 
+import com.codewithfk.eventhub.event.data.response.EventDetailsResponse
 import com.codewithfk.eventhub.event.data.response.EventListResponse
 import httpClient
 import io.ktor.client.HttpClient
@@ -38,6 +39,16 @@ object NetworkHandler {
             })
         }
     }
+    private suspend fun getEventDetails(
+        endPoint: String,
+        id:String
+    ): EventDetailsResponse {
+        val baseUrl = "$BASE_URL$endPoint/$id"
+        return  kTorClient.get(baseUrl) {
+            parameter("apikey", API_KEY)
+        }.body()
+    }
+
     private suspend fun fetchEvents(
         endPoint: String,
         params: Map<String, String>?
@@ -54,6 +65,10 @@ object NetworkHandler {
 
     suspend fun createEventsUrl(): EventListResponse {
         return fetchEvents(EVENTS_ENDPOINT, null)
+    }
+
+    suspend fun getEventDetails(id:String): EventDetailsResponse {
+        return getEventDetails(EVENT_DETAILS_ENDPOINT, id)
     }
 
 }

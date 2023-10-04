@@ -1,5 +1,8 @@
 package com.codewithfk.eventhub.event.data.response
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Start(
     val dateTBA: Boolean,
     val dateTBD: Boolean,

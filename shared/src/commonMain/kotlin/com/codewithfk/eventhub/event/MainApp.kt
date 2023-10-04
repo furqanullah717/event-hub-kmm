@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import com.codewithfk.eventhub.core.presentation.stringResource
 import com.codewithfk.eventhub.di.AppModule
+import com.codewithfk.eventhub.event.presentation.details.EventDetailsScreen
 import com.codewithfk.eventhub.event.presentation.home.HomeScreen
 import com.codewithfk.eventhub.event.splash.SplashScreen
 import com.codewithfk.eventhub.theme.AppTheme
@@ -36,6 +38,7 @@ import dev.icerock.moko.resources.ImageResource
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
+import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.navigation.transition.NavTransition
 
@@ -97,12 +100,8 @@ fun App(
                 // Assign the navigator to the NavHost
                 navigator = navigator,
                 // Navigation transition for the scenes in this NavHost, this is optional
-                navTransition = NavTransition(
-                    createTransition = slideInHorizontally(),
-                    destroyTransition = slideOutHorizontally()
-                ),
                 // The start destination
-                initialRoute = "/home",
+                initialRoute = "/splash",
             ) {
                 // Define a scene to the navigation graph
                 scene(
@@ -144,7 +143,17 @@ fun App(
                     )
                 ) {
                     showBottomBar.value = true
-                    Box(){}
+                    Box { }
+                }
+                scene(
+                    // Scene's route path
+                    route = "/details/{id}",
+                    // Navigation transition for this scene, this is optional
+                ) {
+                    val id: String = it.path<String>("id")!!
+                    showBottomBar.value = false
+                    EventDetailsScreen(id, appModule, navigator)
+
                 }
             }
         }
