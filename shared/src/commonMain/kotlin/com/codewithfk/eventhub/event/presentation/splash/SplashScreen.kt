@@ -1,4 +1,4 @@
-package com.codewithfk.eventhub.event.splash
+package com.codewithfk.eventhub.event.presentation.splash
 
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
