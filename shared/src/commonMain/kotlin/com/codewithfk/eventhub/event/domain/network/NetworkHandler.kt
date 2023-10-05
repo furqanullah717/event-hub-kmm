@@ -42,7 +42,7 @@ object NetworkHandler {
     private suspend fun getEventDetails(
         endPoint: String,
         id:String
-    ): EventDetailsResponse {
+    ): EventDetailsResponse? {
         val baseUrl = "$BASE_URL$endPoint/$id"
         return  kTorClient.get(baseUrl) {
             parameter("apikey", API_KEY)
@@ -63,11 +63,11 @@ object NetworkHandler {
     }
 
 
-    suspend fun createEventsUrl(): EventListResponse {
+    suspend fun createEventsUrl(): EventListResponse? {
         return fetchEvents(EVENTS_ENDPOINT, null)
     }
 
-    suspend fun getEventDetails(id:String): EventDetailsResponse {
+    suspend fun getEventDetails(id:String): EventDetailsResponse? {
         return getEventDetails(EVENT_DETAILS_ENDPOINT, id)
     }
 

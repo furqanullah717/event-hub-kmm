@@ -19,7 +19,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -197,8 +199,48 @@ fun HomeScreen(appModule: AppModule, navigator: Navigator) {
                 Spacer(modifier = Modifier.size(32.dp))
 
                 val state = viewModel.state.collectAsState(null)
-                state.value?.let {
-                    EventRow("Popular Events", it._embedded.events, navigator)
+                when (state.value) {
+                    is HomeScreenState.Loading -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(48.dp),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(text = "Loading...")
+                        }
+                    }
+
+                    is HomeScreenState.Error -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "Error Fetching data! please try again")
+                            Button(
+                                onClick = { viewModel.getData() },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(text = "Retry")
+                            }
+                        }
+                    }
+
+                    is HomeScreenState.Success -> {
+                        state.value?.let {
+                            val response = (it as HomeScreenState.Success).data
+                            EventRow("Popular Events", response._embedded.events, navigator)
+                        }
+                    }
+
+                    else -> {
+                        Text(text = "Null")
+                    }
                 }
 
             }
@@ -340,6 +382,7 @@ fun EventCard(event: Event, onClicked: (String) -> Unit) {
         }
     }
 }
+
 
 @Composable
 fun GoingItem() {

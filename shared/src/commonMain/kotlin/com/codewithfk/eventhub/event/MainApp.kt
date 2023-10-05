@@ -108,11 +108,11 @@ fun App(
                 navTransition = NavTransition(
                     createTransition = slideInHorizontally(
                         initialOffsetX = { it },
-                        animationSpec = tween(durationMillis = 700)
+                        animationSpec = tween(durationMillis = 300)
                     ),
                     destroyTransition = slideOutHorizontally(
                         targetOffsetX = { it },
-                        animationSpec = tween(durationMillis = 700)),
+                        animationSpec = tween(durationMillis = 300)),
                 )
             ) {
                 // Define a scene to the navigation graph

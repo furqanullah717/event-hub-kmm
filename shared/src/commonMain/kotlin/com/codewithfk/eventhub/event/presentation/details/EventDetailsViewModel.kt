@@ -13,16 +13,21 @@ import kotlinx.coroutines.withContext
 
 class EventDetailsViewModel : ViewModel() {
 
-    private val _state = MutableStateFlow<EventDetailsResponse?>(null)
-    val state: StateFlow<EventDetailsResponse?> = _state
+    private val _state = MutableStateFlow<DetailsScreenState?>(DetailsScreenState.Loading)
+    val state: StateFlow<DetailsScreenState?> = _state
 
     fun getEventDetails(id: String) {
         viewModelScope.launch {
+            _state.tryEmit(DetailsScreenState.Loading)
             withContext(Dispatchers.IO) {
                 val res = NetworkHandler.getEventDetails(id)
-               withContext(Dispatchers.Main){
-                   _state.tryEmit(res)
-               }
+                withContext(Dispatchers.Main) {
+                    if (res != null) {
+                        _state.tryEmit(DetailsScreenState.Success(res))
+                    } else {
+                        _state.tryEmit(DetailsScreenState.Error)
+                    }
+                }
 
             }
         }
