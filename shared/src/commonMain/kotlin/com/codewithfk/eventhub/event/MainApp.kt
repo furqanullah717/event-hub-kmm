@@ -2,9 +2,11 @@ package com.codewithfk.eventhub.event
 
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -103,6 +105,15 @@ fun App(
                 // Navigation transition for the scenes in this NavHost, this is optional
                 // The start destination
                 initialRoute = NavRouts.Splash.route,
+                navTransition = NavTransition(
+                    createTransition = slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(durationMillis = 700)
+                    ),
+                    destroyTransition = slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(durationMillis = 700)),
+                )
             ) {
                 // Define a scene to the navigation graph
                 scene(
@@ -129,9 +140,7 @@ fun App(
                     // Scene's route path
                     route = NavRouts.Home.route,
                     // Navigation transition for this scene, this is optional
-                    navTransition = NavTransition(
-                        createTransition = fadeIn(), destroyTransition = fadeOut()
-                    )
+
                 ) {
                     showBottomBar.value = true
                     HomeScreen(appModule, navigator)
@@ -140,9 +149,7 @@ fun App(
                     // Scene's route path
                     route = NavRouts.Profile.route,
                     // Navigation transition for this scene, this is optional
-                    navTransition = NavTransition(
-                        createTransition = fadeIn(), destroyTransition = fadeOut()
-                    )
+
                 ) {
                     showBottomBar.value = true
                     Box { }

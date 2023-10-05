@@ -25,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,39 +59,42 @@ import moe.tlaster.precompose.navigation.Navigator
 
 @Composable
 fun EventDetailsScreen(id: String, appModule: AppModule, navigator: Navigator) {
-    val viewModel = getViewModel(key = "even_details_screen", factory = viewModelFactory {
-        EventDetailsViewModel()
-    })
+    Scaffold {
+        val viewModel = getViewModel(key = "even_details_screen", factory = viewModelFactory {
+            EventDetailsViewModel()
+        })
 
-    LaunchedEffect(key1 = true) {
-        viewModel.getEventDetails(id)
-    }
-    val state = viewModel.state.collectAsState()
+        LaunchedEffect(key1 = true) {
+            viewModel.getEventDetails(id)
+        }
+        val state = viewModel.state.collectAsState()
 
-    state.value?.let {
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-            Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(
-                    rememberScrollState()
-                )
-            ) {
-                EventDetailsContent(it)
-            }
-            Button(
-                onClick = {
+        state.value?.let {
+            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                Column(
+                    modifier = Modifier.fillMaxSize().verticalScroll(
+                        rememberScrollState()
+                    )
+                ) {
+                    EventDetailsContent(it)
+                }
+                Button(
+                    onClick = {
 
-                },
-                modifier = Modifier.padding(horizontal = 16.dp).height(60.dp).fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
-                    .align(Alignment.BottomCenter),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(text = "Buy Ticket Now")
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp).height(60.dp).fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+                        .align(Alignment.BottomCenter),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(text = "Buy Ticket Now")
+                }
+
             }
 
         }
-
     }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
