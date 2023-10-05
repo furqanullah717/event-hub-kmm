@@ -20,7 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.codewithfk.eventhub.di.AppModule
 import com.codewithfk.eventhub.event.data.response.Event
+import com.codewithfk.eventhub.event.navigation.NavRouteUtils
 import com.codewithfk.eventhub.theme.accent1
 import com.codewithfk.eventhub.theme.accent2
 import com.codewithfk.eventhub.theme.accent3
@@ -267,7 +267,7 @@ fun EventRow(title: String, events: List<Event>, navigator: Navigator) {
         LazyRow {
             items(events.size) { index ->
                 EventCard(events[index], onClicked = {
-                    navigator.navigate("/details/$it")
+                    navigator.navigate(NavRouteUtils.getEventDetailsRoute(it))
                 })
             }
         }
@@ -328,7 +328,7 @@ fun EventCard(event: Event, onClicked: (String) -> Unit) {
                 )
                 Spacer(Modifier.size(8.dp))
                 Text(
-                    text = "${event._embedded?.venues?.getOrNull(0)?.address?.line1 ?: ""}",
+                    text = event._embedded?.venues?.getOrNull(0)?.address?.line1 ?: "",
                     fontSize = 16.sp,
                     fontWeight = FontWeight(500),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
