@@ -2,9 +2,11 @@ package com.codewithfk.eventhub.event
 
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,9 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import com.codewithfk.eventhub.core.presentation.stringResource
 import com.codewithfk.eventhub.di.AppModule
+import com.codewithfk.eventhub.event.navigation.NavRouts
 import com.codewithfk.eventhub.event.presentation.details.EventDetailsScreen
 import com.codewithfk.eventhub.event.presentation.home.HomeScreen
-import com.codewithfk.eventhub.event.splash.SplashScreen
+import com.codewithfk.eventhub.event.presentation.splash.SplashScreen
 import com.codewithfk.eventhub.theme.AppTheme
 import com.codewithfk.goodnight.MR
 import dev.icerock.moko.resources.ImageResource
@@ -72,7 +75,7 @@ fun App(
                         BottomNavActionItem(
                             modifier = Modifier.weight(1f).fillMaxSize().clickable {
                                 if (selectedTab.value != home) {
-                                    navigator.navigate("/home")
+                                    navigator.navigate(NavRouts.Home.route)
                                     selectedTab.value = home
                                 }
                             },
@@ -83,7 +86,7 @@ fun App(
                         BottomNavActionItem(
                             modifier = Modifier.weight(1f).fillMaxSize().clickable {
                                 if (selectedTab.value != profile) {
-                                    navigator.navigate("/profile")
+                                    navigator.navigate(NavRouts.Profile.route)
                                     selectedTab.value = profile
                                 }
                             },
@@ -101,12 +104,21 @@ fun App(
                 navigator = navigator,
                 // Navigation transition for the scenes in this NavHost, this is optional
                 // The start destination
-                initialRoute = "/splash",
+                initialRoute = NavRouts.Splash.route,
+                navTransition = NavTransition(
+                    createTransition = slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    destroyTransition = slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(durationMillis = 300)),
+                )
             ) {
                 // Define a scene to the navigation graph
                 scene(
                     // Scene's route path
-                    route = "/splash",
+                    route = NavRouts.Splash.route,
                     // Navigation transition for this scene, this is optional
                 ) {
                     showBottomBar.value = false
@@ -116,7 +128,8 @@ fun App(
                         onSplashEndedInvalid = {},
                         onSplashEndedValid = {
                             navigator.navigate(
-                                "/home", NavOptions(popUpTo = PopUpTo("/splash", true))
+                                NavRouts.Home.route,
+                                NavOptions(popUpTo = PopUpTo(NavRouts.Splash.route, true))
                             )
                         },
                         onStart = {},
@@ -125,29 +138,25 @@ fun App(
                 }
                 scene(
                     // Scene's route path
-                    route = "/home",
+                    route = NavRouts.Home.route,
                     // Navigation transition for this scene, this is optional
-                    navTransition = NavTransition(
-                        createTransition = fadeIn(), destroyTransition = fadeOut()
-                    )
+
                 ) {
                     showBottomBar.value = true
                     HomeScreen(appModule, navigator)
                 }
                 scene(
                     // Scene's route path
-                    route = "/profile",
+                    route = NavRouts.Profile.route,
                     // Navigation transition for this scene, this is optional
-                    navTransition = NavTransition(
-                        createTransition = fadeIn(), destroyTransition = fadeOut()
-                    )
+
                 ) {
                     showBottomBar.value = true
                     Box { }
                 }
                 scene(
                     // Scene's route path
-                    route = "/details/{id}",
+                    route = NavRouts.EventDetails.route,
                     // Navigation transition for this scene, this is optional
                 ) {
                     val id: String = it.path<String>("id")!!

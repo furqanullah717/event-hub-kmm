@@ -1,10 +1,10 @@
 package com.codewithfk.eventhub.event.presentation.details
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +24,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,11 +47,9 @@ import androidx.compose.ui.unit.sp
 import com.codewithfk.eventhub.di.AppModule
 import com.codewithfk.eventhub.event.data.response.EventDetailsResponse
 import com.codewithfk.eventhub.event.presentation.home.GoingItem
-import com.codewithfk.eventhub.event.presentation.home.HomeViewModel
 import com.codewithfk.goodnight.MR
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.compose.painterResource
 import io.kamel.image.KamelImage
@@ -58,48 +58,97 @@ import moe.tlaster.precompose.navigation.Navigator
 
 @Composable
 fun EventDetailsScreen(id: String, appModule: AppModule, navigator: Navigator) {
-    val viewModel = getViewModel(key = "even_details_screen", factory = viewModelFactory {
-        EventDetailsViewModel()
-    })
+    Scaffold {
+        val viewModel = getViewModel(key = "even_details_screen", factory = viewModelFactory {
+            EventDetailsViewModel()
+        })
 
-    LaunchedEffect(key1 = true) {
-        viewModel.getEventDetails(id)
-    }
-    val state = viewModel.state.collectAsState()
+        LaunchedEffect(key1 = true) {
+            viewModel.getEventDetails(id)
+        }
 
-    state.value?.let {
-        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-            Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(
-                    rememberScrollState()
-                )
-            ) {
-                EventDetailsContent(it)
-            }
-            Button(
-                onClick = {
-
-                },
-                modifier = Modifier.padding(horizontal = 16.dp).height(60.dp).fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
-                    .align(Alignment.BottomCenter),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(text = "Buy Ticket Now")
+        val state = viewModel.state.collectAsState()
+        when (state.value) {
+            is DetailsScreenState.Loading -> {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(text = "Loading...")
+                }
             }
 
+            is DetailsScreenState.Error -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "Error Fetching data! please try again")
+                    Button(
+                        onClick = { viewModel.getEventDetails(id) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Retry")
+                    }
+                }
+            }
+
+            is DetailsScreenState.Success -> {
+                (state.value as? DetailsScreenState.Success)?.let {
+                    val res = it.data
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize().verticalScroll(
+                                rememberScrollState()
+                            )
+                        ) {
+                            EventDetailsContent(res) { navigator.popBackStack() }
+                        }
+                        Button(
+                            onClick = {
+
+                            },
+                            modifier = Modifier.padding(horizontal = 16.dp).height(60.dp)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.2f))
+                                .align(Alignment.BottomCenter),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(text = "Buy Ticket Now")
+                        }
+
+                    }
+
+                }
+            }
+
+            else -> {
+                Text(text = "Null")
+            }
         }
 
     }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EventDetailsContent(event: EventDetailsResponse) {
+fun EventDetailsContent(event: EventDetailsResponse, onBackClick: () -> Unit) {
     val localDensity = LocalDensity.current
     var columnHeightDp by remember {
         mutableStateOf(0.dp)
     }
+
     Box(modifier = Modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxWidth().height(244.dp)
@@ -128,7 +177,9 @@ fun EventDetailsContent(event: EventDetailsResponse) {
                         Image(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(16.dp).clickable {
+                                onBackClick.invoke()
+                            },
                             colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(
                                 MaterialTheme.colorScheme.onPrimary
                             )
@@ -171,7 +222,7 @@ fun EventDetailsContent(event: EventDetailsResponse) {
                     )
                 }
                 Spacer(modifier = Modifier.size(32.dp))
-                event.promoter?.let {
+                event.promoter.let {
                     EventDetailRow(
                         imageResource = MR.images.promoter, item1 = it.name, item2 = it.description
                     )
