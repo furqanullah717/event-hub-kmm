@@ -2,7 +2,11 @@
 
 Welcome to the Event Registration App! This is a Kotlin Multiplatform (KMP) project that allows users to view a list of events and register for their preferred events. This project serves as a training ground for Kotlin Multiplatform development.
 
-![App Screenshots](screenshots.png)
+<p float="left">
+  <img src="Screenshot_1696441186.png" width="200" />
+  <img src="Screenshot_1696441193.png" width="200" /> 
+  <img src="Screenshot_1696441211.png" width="200" />
+</p>
 
 ## Features
 
